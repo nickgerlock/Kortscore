@@ -2,40 +2,66 @@
 import { writeFile } from 'node:fs/promises';
 import { Words } from "./wordlist.js";
 
+/**
+ * @typedef {{
+ * name: string,
+ * getKortScore: (word: string) => number | string,
+ * }} KortScoreConfig
+ */
+
+/**
+ * @type {Record<string, KortScoreConfig>}
+ */
 const configs = {
   "add": {
     name: 'add',
     getKortScore(word) {
       /** @type {(a: number, b: number) => number} */
-      return word.split("").map(character => character.charCodeAt(0)).reduce((/** @type {any} */ a, /** @type {any} */ b) => a + b, 0);
+      return word.split("").map(character => character.charCodeAt(0)).reduce((a, b) => a + b, 0);
     },
   },
   "multiply": {
     name: 'multiply',
     getKortScore(word) {
       /** @type {(a: number, b: number) => number} */
-      return word.split("").map(character => character.charCodeAt(0)).reduce((/** @type {number} */ a, /** @type {number} */ b) => a * b, 0);
+      return word.split("").map(character => character.charCodeAt(0)).reduce((a, b) => a * b, 1);
     },
   },
   "xor-madness": {
     name: 'xor-madness',
     getKortScore(word) {
-      const vector = word.split("").map(character => character.charCodeAt(0) - 97).reduce((vector, letterCharCode) => {
+      const vector = new Array(26).fill(0);
+      word.split("").map(character => character.charCodeAt(0) - 97).forEach(letterCharCode => {
         vector[letterCharCode] ^= 1;
-        return vector;
-      }, new Array(26).fill(0));
+      });
+
+      return vector.join("");
+    },
+  },
+  "actual-solution": {
+    name: 'actual_solution',
+    getKortScore(word) {
+      const vector = new Array(26).fill(0);
+      word.split("").map(character => character.charCodeAt(0) - 97).forEach(letterCharCode => {
+        vector[letterCharCode] += 1;
+      });
 
       return vector.join("");
     },
   },
 };
 
-const OPERATION = configs["xor-madness"];
+const operationName = process.argv[2];
+const operation = configs[operationName];
+if (!operation) {
+  console.error(`No known Kortscore algorithm with name ${operationName}. Exiting.`);
+  process.exit(1);
+}
 
-/** @type {Map<number, string[]>} */
+/** @type {Map<number | string, string[]>} */
 const scoreToWords = new Map();
-Words.forEach((word, index) => {
-  const score = OPERATION.getKortScore(word);
+Words.forEach((word) => {
+  const score = operation.getKortScore(word);
   const current = scoreToWords.get(score) || [];
   scoreToWords.set(score, [...current, word]);
 });
@@ -70,4 +96,6 @@ const formatted = entriesWithMultipleWords.map(([score, words]) => {
   return `${score}\n    ${words.length} words\n    ${numAnagramGroups} anagram groups:\n    ${numWordLengths} distinct word lengths\n${wordText}`
 }).filter(line => line.length).join("\n");
 
-writeFile(`results/kortscore_${OPERATION.name}.txt`, formatted);
+writeFile(`results/kortscore_${operation.name}.txt`, formatted).then(() => {
+  process.exit(0);
+});
