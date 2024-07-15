@@ -1,0 +1,12 @@
+{
+  "name": "kortscore",
+  "version": "1.0.0",
+  "description": "Kortscore analyzer",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "type": "module",
+  "author": "Nick Gerlock",
+  "license": "ISC"
+}
