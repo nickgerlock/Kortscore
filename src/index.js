@@ -1,55 +1,7 @@
 // @ts-check
 import { writeFile } from 'node:fs/promises';
 import { Words } from "./wordlist.js";
-
-/**
- * @typedef {{
- * name: string,
- * getKortScore: (word: string) => number | string,
- * }} KortScoreConfig
- */
-
-/**
- * @type {Record<string, KortScoreConfig>}
- */
-const configs = {
-  "add": {
-    name: 'add',
-    getKortScore(word) {
-      /** @type {(a: number, b: number) => number} */
-      return word.split("").map(character => character.charCodeAt(0)).reduce((a, b) => a + b, 0);
-    },
-  },
-  "multiply": {
-    name: 'multiply',
-    getKortScore(word) {
-      /** @type {(a: number, b: number) => number} */
-      return word.split("").map(character => character.charCodeAt(0)).reduce((a, b) => a * b, 1);
-    },
-  },
-  "xor-madness": {
-    name: 'xor-madness',
-    getKortScore(word) {
-      const vector = new Array(26).fill(0);
-      word.split("").map(character => character.charCodeAt(0) - 97).forEach(letterCharCode => {
-        vector[letterCharCode] ^= 1;
-      });
-
-      return vector.join("");
-    },
-  },
-  "actual-solution": {
-    name: 'actual_solution',
-    getKortScore(word) {
-      const vector = new Array(26).fill(0);
-      word.split("").map(character => character.charCodeAt(0) - 97).forEach(letterCharCode => {
-        vector[letterCharCode] += 1;
-      });
-
-      return vector.join("");
-    },
-  },
-};
+import { configs } from './algorithms.js';
 
 const operationName = process.argv[2];
 const operation = configs[operationName];
@@ -74,7 +26,7 @@ const entriesWithMultipleWords = Array.from(scoreToWords)
   return words.length > 1;
 });
 
-const formatted = entriesWithMultipleWords.map(([score, words]) => {
+const formattedOutput = entriesWithMultipleWords.map(([score, words]) => {
   /** @type {Map<string, number>} */
   const sortedWordToCount = new Map();
   /** @type {Map<number, number>} */
@@ -96,6 +48,6 @@ const formatted = entriesWithMultipleWords.map(([score, words]) => {
   return `${score}\n    ${words.length} words\n    ${numAnagramGroups} anagram groups:\n    ${numWordLengths} distinct word lengths\n${wordText}`
 }).filter(line => line.length).join("\n");
 
-writeFile(`results/kortscore_${operation.name}.txt`, formatted).then(() => {
+writeFile(`results/kortscore_${operation.name}.txt`, formattedOutput).then(() => {
   process.exit(0);
 });
