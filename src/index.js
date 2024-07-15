@@ -70,4 +70,4 @@ const formatted = entriesWithMultipleWords.map(([score, words]) => {
   return `${score}\n    ${words.length} words\n    ${numAnagramGroups} anagram groups:\n    ${numWordLengths} distinct word lengths\n${wordText}`
 }).filter(line => line.length).join("\n");
 
-writeFile(`kortscore_${OPERATION.name}.txt`, formatted);
+writeFile(`results/kortscore_${OPERATION.name}.txt`, formatted);
