@@ -27,7 +27,7 @@ export const configs = {
     name: 'xor-madness',
     getKortScore(word) {
       const vector = new Array(26).fill(0);
-      word.split("").map(character => character.charCodeAt(0) - 97).forEach(letterCharCode => {
+      word.split("").map(character => character.charCodeAt(0) - 97).forEach(letterIndex => {
         vector[letterCharCode] ^= 1;
       });
 
@@ -38,11 +38,24 @@ export const configs = {
     name: 'actual_solution',
     getKortScore(word) {
       const vector = new Array(26).fill(0);
-      word.split("").map(character => character.charCodeAt(0) - 97).forEach(letterCharCode => {
+      word.split("").map(character => character.charCodeAt(0) - 97).forEach(letterIndex => {
         vector[letterCharCode] += 1;
       });
 
       return vector.join("");
+    },
+  },
+  "insane-base-n": {
+    name: 'insane-base-n',
+    getKortScore(word) {
+      const MAX_REPEATED_LETTERS = 26;
+
+      let total = BigInt(0);
+      word.split("").map(character => character.charCodeAt(0) - 97).forEach(letterIndex => {
+        total += BigInt(Math.pow(MAX_REPEATED_LETTERS, letterIndex));
+      });
+
+      return total;
     },
   },
 };
