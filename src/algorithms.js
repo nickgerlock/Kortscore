@@ -5,6 +5,35 @@
  * }} KortScoreConfig
  */
 
+const primes = [
+  2,
+  3,
+  5,
+  7,
+  11,
+  13,
+  17,
+  19,
+  23,
+  29,
+  31,
+  37,
+  41,
+  43,
+  47,
+  53,
+  59,
+  61,
+  67,
+  71,
+  73,
+  79,
+  83,
+  89,
+  97,
+  101,
+].map(number => BigInt(number));
+
 /**
  * @type {Record<string, KortScoreConfig>}
  */
@@ -53,6 +82,17 @@ export const configs = {
       let total = BigInt(0);
       word.split("").map(character => character.charCodeAt(0) - 97).forEach(letterIndex => {
         total += BigInt(Math.pow(MAX_REPEATED_LETTERS, letterIndex));
+      });
+
+      return total;
+    },
+  },
+  "primes": {
+    name: "primes",
+    getKortScore(word) {
+      let total = BigInt(1);
+      word.split("").map(character => character.charCodeAt(0) - 97).forEach(letterIndex => {
+        total *= primes[letterIndex];
       });
 
       return total;
